@@ -26,7 +26,7 @@ function criarTarefasIniciais() {
 }
 
 export function TarefasProvider({ children }) {
-  // As duas abas consultam e atualizam a mesma lista em memória.
+  // As abas consultam e atualizam a mesma lista em memória.
   const [tarefas, setTarefas] = useState(criarTarefasIniciais);
   const [formulario, setFormulario] = useState(null);
 
@@ -64,7 +64,7 @@ export function TarefasProvider({ children }) {
         aoEditar: (tarefa, reagendar) => setFormulario({ tarefa, reagendar }),
       }}>
       {children}
-      {/* Hoje e Calendário abrem o mesmo formulário, com a data escolhida na aba. */}
+      {/* O mesmo formulário é usado para criar ou editar tarefas pelas abas. */}
       {formulario ? (
         <FormularioTarefa
           tarefa={formulario.tarefa}

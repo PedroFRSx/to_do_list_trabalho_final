@@ -30,6 +30,15 @@ export default function LayoutAbas() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="progresso"
+        options={{
+          title: 'Progresso',
+          tabBarIcon: ({ focused, size }) => (
+            <Ionicons name="stats-chart-outline" size={size} color={focused ? '#FFADB8' : '#E0E8EF'} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

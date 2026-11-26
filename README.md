@@ -14,7 +14,7 @@ A ideia é fazer um To-Do List. Um aplicativo que ajuda o usuário a se organiza
 2. Hoje. Resumo do dia, com tarefas pendentes, concluídas e atrasadas.
 3. Cadastro e edição das atividades, acessíveis pela tela Hoje.
 4. Calendário. Visualização das tarefas por data.
-5. Progresso. Quantidade de tarefas realizadas.
+5. Progresso. Taxa de conclusão, totais e lista de tarefas concluídas com filtros por semana, mês ou todo o período.
 6. Lembretes.
 
 A tela Hoje apresenta informações como:
