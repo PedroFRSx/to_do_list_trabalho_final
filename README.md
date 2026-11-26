@@ -1,40 +1,40 @@
-# Welcome to your Expo app 👋
+A ideia é fazer um To-Do List. Um aplicativo que ajuda o usuário a se organizar.
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Funcionalidades
 
-## Get started
+1. Cadastro de tarefas.
+2. Prioridades.
+3. Agenda diária.
+4. Controle de conclusão.
+5. Lembretes (previstos).
 
-1. Install dependencies
+## Telas
 
-   ```bash
-   npm install
-   ```
+1. Início e perfil do usuário. Nesta etapa, a edição do nome é acessada pelo avatar na tela Hoje.
+2. Hoje. Resumo do dia, com tarefas pendentes, concluídas e atrasadas.
+3. Cadastro e edição das atividades, acessíveis pela tela Hoje.
+4. Calendário (previsto). Visualização das tarefas por data.
+5. Progresso (previsto). Quantidade de tarefas realizadas.
+6. Lembretes (previsto).
 
-2. Start the app
+A tela Hoje apresenta informações como:
 
-   ```bash
-   npx expo start
-   ```
+- Quantas tarefas o usuário tem para hoje.
+- Quantas estão pendentes.
+- Quantas já foram concluídas.
+- Quantas estão atrasadas.
+- Qual é a próxima tarefa.
 
-In the output, you'll find options to open the app in a
+As tarefas e o nome do usuário ficam em memória durante a sessão.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Vamos usar a API Nager.Date
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+A API fornece informações sobre feriados de diversos países, incluindo o Brasil.
 
-## Learn more
+Possibilidade: mostrar feriados na agenda e ajudar o usuário a planejar suas tarefas.
 
-To learn more about developing your project with Expo, look at the following resources:
+Exemplo:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- Próximo feriado.
+- Feriado nacional.
+- Informação obtida pela API de feriados.
