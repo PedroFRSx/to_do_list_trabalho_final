@@ -13,9 +13,9 @@ A ideia é fazer um To-Do List. Um aplicativo que ajuda o usuário a se organiza
 1. Início e perfil do usuário. Nesta etapa, a edição do nome é acessada pelo avatar na tela Hoje.
 2. Hoje. Resumo do dia, com tarefas pendentes, concluídas e atrasadas.
 3. Cadastro e edição das atividades, acessíveis pela tela Hoje.
-4. Calendário (previsto). Visualização das tarefas por data.
-5. Progresso (previsto). Quantidade de tarefas realizadas.
-6. Lembretes (previsto).
+4. Calendário. Visualização das tarefas por data.
+5. Progresso. Quantidade de tarefas realizadas.
+6. Lembretes.
 
 A tela Hoje apresenta informações como:
 

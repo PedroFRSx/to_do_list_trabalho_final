@@ -10,7 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 const prioridades = ['Baixa', 'Média', 'Alta'];
 
@@ -64,99 +64,102 @@ export default function FormularioTarefa({
   }
 
   return (
-    <Modal animationType="slide" onRequestClose={aoFechar}>
-      <SafeAreaView style={styles.tela}>
-        <KeyboardAvoidingView
-          style={styles.tela}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <ScrollView
-            contentContainerStyle={styles.conteudo}
-            keyboardShouldPersistTaps="handled">
-            <View style={styles.cabecalho}>
-              <Text style={styles.titulo}>
-                {reagendar ? 'Reagendar tarefa' : tarefa ? 'Editar tarefa' : 'Nova tarefa'}
-              </Text>
-              <Pressable
-                accessibilityRole="button"
-                onPress={aoFechar}
-                style={styles.cancelar}>
-                <Text style={styles.cancelarTexto}>Cancelar</Text>
-              </Pressable>
-            </View>
-            <Text style={styles.rotulo}>Título</Text>
-            <TextInput
-              accessibilityLabel="Título"
-              style={styles.campo}
-              value={titulo}
-              onChangeText={setTitulo}
-              placeholder="Ex.: Revisar a aula"
-              placeholderTextColor="#B9C7D2"
-              maxLength={100}
-            />
-            <Text style={styles.rotulo}>Prioridade</Text>
-            <View style={styles.opcoes}>
-              {prioridades.map((opcao) => (
+    <Modal animationType="slide" presentationStyle="fullScreen" onRequestClose={aoFechar}>
+      {/* O modal mede sua própria área segura para manter o cabeçalho abaixo da barra de status. */}
+      <SafeAreaProvider style={styles.tela}>
+        <SafeAreaView style={styles.tela} edges={['top', 'right', 'bottom', 'left']}>
+          <KeyboardAvoidingView
+            style={styles.tela}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+            <ScrollView
+              contentContainerStyle={styles.conteudo}
+              keyboardShouldPersistTaps="handled">
+              <View style={styles.cabecalho}>
+                <Text style={styles.titulo}>
+                  {reagendar ? 'Reagendar tarefa' : tarefa ? 'Editar tarefa' : 'Nova tarefa'}
+                </Text>
                 <Pressable
-                  key={opcao}
                   accessibilityRole="button"
-                  accessibilityState={{ selected: prioridade === opcao }}
-                  onPress={() => setPrioridade(opcao)}
-                  style={[
-                    styles.opcao,
-                    prioridade === opcao && styles.opcaoAtiva,
-                  ]}>
-                  <Text
-                    style={[
-                      styles.opcaoTexto,
-                      prioridade === opcao && styles.textoEscuro,
-                    ]}>
-                    {opcao}
-                  </Text>
+                  onPress={aoFechar}
+                  style={styles.cancelar}>
+                  <Text style={styles.cancelarTexto}>Cancelar</Text>
                 </Pressable>
-              ))}
-            </View>
-            <Text style={styles.rotulo}>Data</Text>
-            <TextInput
-              accessibilityLabel="Data"
-              style={styles.campo}
-              value={data}
-              onChangeText={setData}
-              placeholder="DD/MM/AAAA"
-              placeholderTextColor="#B9C7D2"
-              maxLength={10}
-            />
-            <Text style={styles.rotulo}>Horário</Text>
-            <TextInput
-              accessibilityLabel="Horário"
-              style={styles.campo}
-              value={horario}
-              onChangeText={setHorario}
-              placeholder="HH:MM"
-              placeholderTextColor="#B9C7D2"
-              maxLength={5}
-            />
-            {erro ? (
-              <Text accessibilityRole="alert" style={styles.erro}>
-                {erro}
-              </Text>
-            ) : null}
-            <Pressable
-              accessibilityRole="button"
-              onPress={salvar}
-              style={styles.salvar}>
-              <Text style={styles.salvarTexto}>Salvar tarefa</Text>
-            </Pressable>
-            {tarefa ? (
+              </View>
+              <Text style={styles.rotulo}>Título</Text>
+              <TextInput
+                accessibilityLabel="Título"
+                style={styles.campo}
+                value={titulo}
+                onChangeText={setTitulo}
+                placeholder="Ex.: Revisar a aula"
+                placeholderTextColor="#B9C7D2"
+                maxLength={100}
+              />
+              <Text style={styles.rotulo}>Prioridade</Text>
+              <View style={styles.opcoes}>
+                {prioridades.map((opcao) => (
+                  <Pressable
+                    key={opcao}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: prioridade === opcao }}
+                    onPress={() => setPrioridade(opcao)}
+                    style={[
+                      styles.opcao,
+                      prioridade === opcao && styles.opcaoAtiva,
+                    ]}>
+                    <Text
+                      style={[
+                        styles.opcaoTexto,
+                        prioridade === opcao && styles.textoEscuro,
+                      ]}>
+                      {opcao}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+              <Text style={styles.rotulo}>Data</Text>
+              <TextInput
+                accessibilityLabel="Data"
+                style={styles.campo}
+                value={data}
+                onChangeText={setData}
+                placeholder="DD/MM/AAAA"
+                placeholderTextColor="#B9C7D2"
+                maxLength={10}
+              />
+              <Text style={styles.rotulo}>Horário</Text>
+              <TextInput
+                accessibilityLabel="Horário"
+                style={styles.campo}
+                value={horario}
+                onChangeText={setHorario}
+                placeholder="HH:MM"
+                placeholderTextColor="#B9C7D2"
+                maxLength={5}
+              />
+              {erro ? (
+                <Text accessibilityRole="alert" style={styles.erro}>
+                  {erro}
+                </Text>
+              ) : null}
               <Pressable
                 accessibilityRole="button"
-                style={styles.excluir}
-                onPress={() => aoExcluir(tarefa.id)}>
-                <Text style={styles.cancelarTexto}>Excluir tarefa</Text>
+                onPress={salvar}
+                style={styles.salvar}>
+                <Text style={styles.salvarTexto}>Salvar tarefa</Text>
               </Pressable>
-            ) : null}
-          </ScrollView>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
+              {tarefa ? (
+                <Pressable
+                  accessibilityRole="button"
+                  style={styles.excluir}
+                  onPress={() => aoExcluir(tarefa.id)}>
+                  <Text style={styles.cancelarTexto}>Excluir tarefa</Text>
+                </Pressable>
+              ) : null}
+            </ScrollView>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
+      </SafeAreaProvider>
     </Modal>
   );
 }
@@ -177,7 +180,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   titulo: { color: '#F7FAFD', fontSize: 26, fontWeight: '700' },
-  cancelar: { paddingVertical: 12, paddingLeft: 12 },
+  cancelar: { minHeight: 44, justifyContent: 'center', paddingLeft: 12 },
   cancelarTexto: { color: '#FFADB8', fontWeight: '700' },
   rotulo: {
     color: '#F1F5F8',

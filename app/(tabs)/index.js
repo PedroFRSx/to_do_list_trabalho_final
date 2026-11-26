@@ -4,97 +4,30 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import CartaoResumo from '@/components/CartaoResumo';
 import EditarNome from '@/components/EditarNome';
-import FormularioTarefa from '@/components/FormularioTarefa';
 import ItemTarefa from '@/components/ItemTarefa';
-
-// Formata no horário local para a data não mudar por causa do fuso.
-function dataLocal(agora, diasAjuste = 0) {
-  const data = new Date(agora);
-  data.setDate(data.getDate() + diasAjuste);
-  const ano = data.getFullYear();
-  const mes = String(data.getMonth() + 1).padStart(2, '0');
-  const dia = String(data.getDate()).padStart(2, '0');
-  return `${ano}-${mes}-${dia}`;
-}
-
-function criarDadosIniciais() {
-  const agora = new Date();
-  const hoje = dataLocal(agora);
-  return {
-    nome: 'Pedro',
-    tarefas: [
-      { id: 1, titulo: 'Revisar conteúdo da aula', categoria: 'Estudos', horario: '09:00', prioridade: 'Alta', data: hoje, concluida: false },
-      { id: 2, titulo: 'Organizar a lista de compras', categoria: 'Casa', horario: '14:30', prioridade: 'Média', data: hoje, concluida: false },
-      { id: 3, titulo: 'Fazer uma caminhada', categoria: 'Saúde', horario: '18:00', prioridade: 'Baixa', data: hoje, concluida: true },
-      { id: 4, titulo: 'Pagar a conta de internet', categoria: 'Pessoal', horario: 'Ontem', prioridade: 'Alta', data: dataLocal(agora, -1), concluida: false },
-    ],
-  };
-}
+import { dataLocal, useTarefas } from '@/context/TarefasContext';
 
 export default function HojeScreen() {
-  // As tarefas e o nome ficam em memória até o app ser reiniciado.
-  const [dados, setDados] = useState(criarDadosIniciais);
-  const [formulario, setFormulario] = useState(null);
+  const { tarefas, aoAlterar, aoAdicionar, aoEditar } = useTarefas();
+  const [nome, setNome] = useState('Pedro');
   const [editarNome, setEditarNome] = useState(false);
-
-  function alterarConclusao(id) {
-    setDados((atuais) => ({
-      ...atuais,
-      tarefas: atuais.tarefas.map((tarefa) =>
-        tarefa.id === id ? { ...tarefa, concluida: !tarefa.concluida } : tarefa
-      ),
-    }));
-  }
-
-  function salvarTarefa(campos, idEditado) {
-    const novaTarefa = { ...campos, id: Date.now(), concluida: false };
-    // Uma única lista alimenta o resumo, as atrasadas e as tarefas de outras datas.
-    setDados((atuais) => ({
-      ...atuais,
-      tarefas: idEditado === undefined
-        ? [...atuais.tarefas, novaTarefa]
-        : atuais.tarefas.map((tarefa) =>
-          tarefa.id === idEditado ? { ...tarefa, ...campos } : tarefa
-        ),
-    }));
-    setFormulario(null);
-  }
-
-  function excluirTarefa(id) {
-    setDados((atuais) => ({
-      ...atuais,
-      tarefas: atuais.tarefas.filter((tarefa) => tarefa.id !== id),
-    }));
-    setFormulario(null);
-  }
 
   return (
     <>
       <PainelHoje
-        tarefas={dados.tarefas}
-        nome={dados.nome}
-        aoAlterar={alterarConclusao}
+        tarefas={tarefas}
+        nome={nome}
+        aoAlterar={aoAlterar}
         aoAbrirPerfil={() => setEditarNome(true)}
-        aoAdicionar={(data) => setFormulario({ data })}
-        aoEditar={(tarefa, reagendar) => setFormulario({ tarefa, reagendar })}
+        aoAdicionar={aoAdicionar}
+        aoEditar={aoEditar}
       />
-      {/* Os formulários abrem sobre Hoje, sem criar rotas nem abas. */}
-      {formulario ? (
-        <FormularioTarefa
-          tarefa={formulario.tarefa}
-          hoje={formulario.data ?? formulario.tarefa?.data}
-          reagendar={formulario.reagendar}
-          aoSalvar={salvarTarefa}
-          aoExcluir={excluirTarefa}
-          aoFechar={() => setFormulario(null)}
-        />
-      ) : null}
       {editarNome ? (
         <EditarNome
-          nome={dados.nome}
+          nome={nome}
           aoFechar={() => setEditarNome(false)}
-          aoSalvar={(nome) => {
-            setDados((atuais) => ({ ...atuais, nome }));
+          aoSalvar={(novoNome) => {
+            setNome(novoNome);
             setEditarNome(false);
           }}
         />
@@ -194,7 +127,7 @@ function PainelHoje({
   });
 
   return (
-    <SafeAreaView style={styles.areaSegura} edges={['top', 'bottom', 'left', 'right']}>
+    <SafeAreaView style={styles.areaSegura} edges={['top', 'left', 'right']}>
       <ScrollView contentContainerStyle={styles.conteudo}>
         <View style={styles.cabecalho}>
           <View style={styles.saudacao}>
