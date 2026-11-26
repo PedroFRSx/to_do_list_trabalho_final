@@ -1,10 +1,19 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from 'expo-router';
+import { BottomTabBar } from 'expo-router/js-tabs';
+
+import AvisoLembrete from '@/components/AvisoLembrete';
 
 export default function LayoutAbas() {
   // Os nomes correspondem aos arquivos de rota dentro de (tabs).
   return (
     <Tabs
+      tabBar={(props) => (
+        <>
+          <AvisoLembrete />
+          <BottomTabBar {...props} />
+        </>
+      )}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: '#FFADB8',
@@ -36,6 +45,15 @@ export default function LayoutAbas() {
           title: 'Progresso',
           tabBarIcon: ({ focused, size }) => (
             <Ionicons name="stats-chart-outline" size={size} color={focused ? '#FFADB8' : '#E0E8EF'} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="lembretes"
+        options={{
+          title: 'Lembretes',
+          tabBarIcon: ({ focused, size }) => (
+            <Ionicons name="notifications-outline" size={size} color={focused ? '#FFADB8' : '#E0E8EF'} />
           ),
         }}
       />

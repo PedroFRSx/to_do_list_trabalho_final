@@ -1,38 +1,25 @@
+import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import CartaoResumo from '@/components/CartaoResumo';
-import EditarNome from '@/components/EditarNome';
 import ItemTarefa from '@/components/ItemTarefa';
 import { dataLocal, useTarefas } from '@/context/TarefasContext';
 
 export default function HojeScreen() {
-  const { tarefas, aoAlterar, aoAdicionar, aoEditar } = useTarefas();
-  const [nome, setNome] = useState('Pedro');
-  const [editarNome, setEditarNome] = useState(false);
+  const router = useRouter();
+  const { tarefas, nome, aoAlterar, aoAdicionar, aoEditar } = useTarefas();
 
   return (
-    <>
-      <PainelHoje
-        tarefas={tarefas}
-        nome={nome}
-        aoAlterar={aoAlterar}
-        aoAbrirPerfil={() => setEditarNome(true)}
-        aoAdicionar={aoAdicionar}
-        aoEditar={aoEditar}
-      />
-      {editarNome ? (
-        <EditarNome
-          nome={nome}
-          aoFechar={() => setEditarNome(false)}
-          aoSalvar={(novoNome) => {
-            setNome(novoNome);
-            setEditarNome(false);
-          }}
-        />
-      ) : null}
-    </>
+    <PainelHoje
+      tarefas={tarefas}
+      nome={nome}
+      aoAlterar={aoAlterar}
+      aoAbrirPerfil={() => router.push('/perfil')}
+      aoAdicionar={aoAdicionar}
+      aoEditar={aoEditar}
+    />
   );
 }
 

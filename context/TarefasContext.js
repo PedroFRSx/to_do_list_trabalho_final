@@ -1,6 +1,9 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, AppState, Pressable, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import FormularioTarefa from '@/components/FormularioTarefa';
+import { carregarPlanejador, salvarPlanejador } from '@/storage/planejador';
 
 const TarefasContext = createContext(null);
 
@@ -26,9 +29,64 @@ function criarTarefasIniciais() {
 }
 
 export function TarefasProvider({ children }) {
-  // As abas consultam e atualizam a mesma lista em memória.
+  // Todas as telas consultam e atualizam a mesma lista.
   const [tarefas, setTarefas] = useState(criarTarefasIniciais);
+  const [nome, setNome] = useState('Pedro');
   const [formulario, setFormulario] = useState(null);
+  const [agora, setAgora] = useState(() => Date.now());
+  const [estadoLeitura, setEstadoLeitura] = useState('carregando');
+  const [tentativaLeitura, setTentativaLeitura] = useState(0);
+  const [erroAoSalvar, setErroAoSalvar] = useState(false);
+  const [tentativaGravacao, setTentativaGravacao] = useState(0);
+  const ultimaRevisao = useRef(0);
+
+  useEffect(() => {
+    try {
+      const registro = carregarPlanejador();
+      if (registro) {
+        setNome(registro.nome);
+        setTarefas(registro.tarefas);
+        ultimaRevisao.current = registro.revisao;
+      }
+      setEstadoLeitura('pronto');
+    } catch {
+      setEstadoLeitura('erro');
+    }
+  }, [tentativaLeitura]);
+
+  useEffect(() => {
+    // Só grava depois da leitura inicial, para manter os dados das sessões anteriores.
+    if (estadoLeitura !== 'pronto') return;
+    try {
+      const revisao = ultimaRevisao.current + 1;
+      salvarPlanejador({ nome, tarefas, revisao });
+      ultimaRevisao.current = revisao;
+      setErroAoSalvar(false);
+    } catch {
+      setErroAoSalvar(true);
+    }
+  }, [estadoLeitura, nome, tarefas, tentativaGravacao]);
+
+  useEffect(() => {
+    // Atualiza a janela dos lembretes inclusive ao voltar para o app.
+    const intervalo = setInterval(() => setAgora(Date.now()), 10_000);
+    const assinatura = AppState.addEventListener('change', (estado) => {
+      if (estado === 'active') setAgora(Date.now());
+    });
+    return () => {
+      clearInterval(intervalo);
+      assinatura.remove();
+    };
+  }, []);
+
+  function definirLembrete(id, minutos) {
+    setAgora(Date.now());
+    setTarefas((atuais) =>
+      atuais.map((tarefa) =>
+        tarefa.id === id ? { ...tarefa, lembreteMinutos: minutos } : tarefa
+      )
+    );
+  }
 
   function alterarConclusao(id) {
     setTarefas((atuais) =>
@@ -55,15 +113,59 @@ export function TarefasProvider({ children }) {
     setFormulario(null);
   }
 
+  if (estadoLeitura !== 'pronto') {
+    return (
+      <SafeAreaView style={styles.carregando}>
+        {estadoLeitura === 'carregando' ? (
+          <ActivityIndicator color="#FF8190" accessibilityLabel="Carregando dados salvos" />
+        ) : (
+          <>
+            <Text style={styles.erro} accessibilityRole="alert">
+              Não foi possível carregar os dados salvos.
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              style={styles.botao}
+              onPress={() => {
+                setEstadoLeitura('carregando');
+                setTentativaLeitura((atual) => atual + 1);
+              }}>
+              <Text style={styles.link}>Tentar novamente</Text>
+            </Pressable>
+          </>
+        )}
+      </SafeAreaView>
+    );
+  }
+
   return (
     <TarefasContext
       value={{
         tarefas,
+        nome,
+        setNome,
+        agora,
+        aoDefinirLembrete: definirLembrete,
         aoAlterar: alterarConclusao,
         aoAdicionar: (data) => setFormulario({ data }),
         aoEditar: (tarefa, reagendar) => setFormulario({ tarefa, reagendar }),
       }}>
       {children}
+      {erroAoSalvar ? (
+        <SafeAreaView edges={['left', 'right', 'bottom']} style={styles.aviso}>
+          <View style={styles.linha}>
+            <Text style={styles.erro} accessibilityRole="alert">
+              Não foi possível salvar as alterações.
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              style={styles.botao}
+              onPress={() => setTentativaGravacao((atual) => atual + 1)}>
+              <Text style={styles.link}>Tentar novamente</Text>
+            </Pressable>
+          </View>
+        </SafeAreaView>
+      ) : null}
       {/* O mesmo formulário é usado para criar ou editar tarefas pelas abas. */}
       {formulario ? (
         <FormularioTarefa
@@ -78,6 +180,17 @@ export function TarefasProvider({ children }) {
     </TarefasContext>
   );
 }
+
+const styles = StyleSheet.create({
+  carregando: {
+    flex: 1, backgroundColor: '#263542', justifyContent: 'center', alignItems: 'center', padding: 20,
+  },
+  aviso: { backgroundColor: '#354858' },
+  linha: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', paddingHorizontal: 12 },
+  erro: { color: '#F7FAFD' },
+  botao: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 8 },
+  link: { color: '#FFADB8', fontWeight: '700' },
+});
 
 export function useTarefas() {
   const contexto = useContext(TarefasContext);
